@@ -3,7 +3,7 @@
 Tips, patterns, and more
 
 ---
-src: ./docs/core/template-refs.md
+src: ./core/template-refs.md
 ---
 
 ---

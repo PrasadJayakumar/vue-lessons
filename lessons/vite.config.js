@@ -17,5 +17,12 @@ export default defineConfig({
     alias: {
       '@/': new URL('./src/', import.meta.url).pathname
     }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: 'src/setupTests.js',
+    reporters: 'default',
+    outputFile: 'unit-test-report.json'
   }
 });

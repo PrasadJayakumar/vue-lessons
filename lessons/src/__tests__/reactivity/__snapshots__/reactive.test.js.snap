@@ -1,0 +1,26 @@
+// Vitest Snapshot v1
+
+exports[`reactive > trigger 1`] = `
+{
+  "key": "qty",
+  "newValue": 2,
+  "oldValue": 1,
+  "type": "set",
+}
+`;
+
+exports[`reactive > trigger 2`] = `
+{
+  "key": "2",
+  "newValue": {
+    "id": 102,
+    "name": "keyboard",
+    "price": 50,
+    "qty": 1,
+  },
+  "oldValue": undefined,
+  "type": "add",
+}
+`;
+
+exports[`reactive > trigger 3`] = `{}`;

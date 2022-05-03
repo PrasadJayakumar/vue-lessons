@@ -1,6 +1,6 @@
 // Vitest Snapshot v1
 
-exports[`reactive > trigger 1`] = `
+exports[`computed > trigger 1`] = `
 {
   "key": "qty",
   "newValue": 2,
@@ -9,7 +9,7 @@ exports[`reactive > trigger 1`] = `
 }
 `;
 
-exports[`reactive > trigger 2`] = `
+exports[`computed > trigger 2`] = `
 {
   "key": "2",
   "newValue": {
@@ -23,4 +23,4 @@ exports[`reactive > trigger 2`] = `
 }
 `;
 
-exports[`reactive > trigger 3`] = `{}`;
+exports[`computed > trigger 3`] = `{}`;

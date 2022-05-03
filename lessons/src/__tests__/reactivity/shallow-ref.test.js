@@ -28,17 +28,20 @@ describe('shallow-ref', () => {
   });
 
   test('force-trigger', () => {
-    // Change the item price
+    // Access the computed value atleast once
+    expect(total.value).toEqual(1450);
+
     // Re-computation will not happen due to shallow-ref
+
+    // Change the item price
     order.value[1].price = 550;
-    expect(total.value).not.toEqual(1450); // GONE WRONG. TODO: fix the issue
+    expect(total.value).not.toEqual(1550);
 
     // Force trigger to re-compute
     triggerRef(order);
     expect(total.value).toEqual(1550);
 
     // Add a new item into order array
-    // Re-computation will not happen due to shallow-ref
     order.value.push({ id: 102, name: 'keyboard', qty: 1, price: 50 });
     expect(total.value).toEqual(1550);
 

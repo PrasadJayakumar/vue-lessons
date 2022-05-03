@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect } from 'vitest';
-import { ref, isRef, computed } from 'vue';
+import { describe, expect } from 'vitest';
+import { ref, isRef, isReactive, computed } from 'vue';
 
 describe('ref', () => {
   test('non-reactive', () => {
@@ -10,7 +10,7 @@ describe('ref', () => {
     expect(lhs).toEqual(9);
 
     a = 2;
-    expect(lhs).toEqual(9); // should be 16
+    expect(lhs).not.toEqual(16); // should be 16
   });
 
   test('primitive-type', () => {
@@ -33,6 +33,12 @@ describe('ref', () => {
     ]);
 
     expect(isRef(order)).toEqual(true);
+
+    expect(isRef(order.value)).toEqual(false);
+    expect(isRef(order.value[0])).toEqual(false);
+    expect(isReactive(order.value[0])).toEqual(true);
+
+    expect(isRef(order.value[0].price)).toEqual(false);
 
     const total = computed(() =>
       order.value.reduce(

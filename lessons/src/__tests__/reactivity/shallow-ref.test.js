@@ -19,7 +19,10 @@ describe('shallow-ref', () => {
   });
 
   test('basics', () => {
+    //
     expect(isRef(order)).toEqual(true);
+
+    // call atleast once
     expect(total.value).toEqual(1450);
 
     // Change the order

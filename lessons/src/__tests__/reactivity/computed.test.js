@@ -26,13 +26,7 @@ describe('computed', () => {
         ),
       {
         onTrigger(e) {
-          debugger;
-          triggeredBy = {
-            key: e.key,
-            type: e.type,
-            newValue: e.newValue,
-            oldValue: e.oldValue
-          };
+          triggeredBy = { key: e.key, type: e.type };
         }
       }
     );
@@ -41,20 +35,20 @@ describe('computed', () => {
     expect(total.value).toEqual(1450);
 
     // change the order quantity
-    triggeredBy = {};
     state.order[0].qty = 2;
-    expect(triggeredBy).toMatchSnapshot();
+    expect(triggeredBy).toEqual({ key: 'qty', type: 'set' });
+    expect(total.value).toEqual(2450);
 
     // add one more item to the Order
-    triggeredBy = {};
     state.order.push({ id: 102, name: 'keyboard', qty: 1, price: 50 });
-    expect(triggeredBy).toMatchSnapshot();
+    expect(triggeredBy).toEqual({ key: '2', type: 'add' });
+    expect(total.value).toEqual(2500);
 
     // change the value of user and
     // verify if total is re-computed
-    triggeredBy = {};
+    triggeredBy = null;
     state.user.name = 'Peter Parker';
-    expect(triggeredBy).toMatchSnapshot();
+    expect(triggeredBy).toBeNull;
   });
 
   test('skip-trigger', () => {
@@ -78,7 +72,7 @@ describe('computed', () => {
     // Use with caution.
     const order = toRaw(state.order);
     order.push({ id: 102, name: 'keyboard', qty: 1, price: 50 });
-    expect(total.value).toEqual(1450);
+    expect(total.value).not.toEqual(1500);
 
     // continue business as usual
     state.order[0].qty = 2;

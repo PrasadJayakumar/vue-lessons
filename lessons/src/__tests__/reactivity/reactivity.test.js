@@ -1,19 +1,13 @@
-import { beforeEach, describe, expect } from 'vitest';
-import { ref, isRef, toRaw, reactive, isReactive, toRefs, computed } from 'vue';
+import { describe, expect } from 'vitest';
+import { ref, isRef, reactive, isReactive, toRefs, computed } from 'vue';
 
-describe('ref', () => {
-  test('non-reactive', () => {
-    let a = 1;
-    let b = 2;
+describe('reactivity', () => {
+  const getOrder = () => [
+    { id: 100, name: 'laptop', qty: 1, price: 1000 },
+    { id: 101, name: 'mobile', qty: 1, price: 450 }
+  ];
 
-    const lhs = (a + b) ** 2;
-    expect(lhs).toEqual(9);
-
-    a = 2;
-    expect(lhs).not.toEqual(16); // should be 16
-  });
-
-  test('primitive-type', () => {
+  test('ref-on-primitive-type', () => {
     let a = ref(1);
     let b = ref(2);
 
@@ -25,14 +19,14 @@ describe('ref', () => {
     a.value = 2;
     expect(lhs.value).toEqual(16);
   });
-});
 
-describe('reactive', () => {
-  test('object-type', () => {
-    const order = reactive([
-      { id: 100, name: 'laptop', qty: 1, price: 1000 },
-      { id: 101, name: 'mobile', qty: 1, price: 450 }
-    ]);
+  test('reactive-on-object-type', () => {
+    const order = reactive(getOrder());
+
+    // reactive is deep
+    expect(isReactive(order)).toEqual(true);
+    expect(isReactive(order[0])).toEqual(true);
+    expect(isReactive(order[0].price)).toEqual(false);
 
     const total = computed(() =>
       order.reduce((subTotal, item) => subTotal + item.qty * item.price, 0)
@@ -43,43 +37,35 @@ describe('reactive', () => {
     expect(total.value).toEqual(2450);
   });
 
-  test('ref-vs-reactive', () => {
-    debugger;
-    const order = [
-      { id: 100, name: 'laptop', qty: 1, price: 1000 },
-      { id: 101, name: 'mobile', qty: 1, price: 450 }
-    ];
-
+  test('ref-on-object-type', () => {
     // References
     // https://github.com/vuejs/core/blob/main/packages/reactivity/src/ref.ts
     // https://github.com/vuejs/core/blob/main/packages/reactivity/src/reactive.ts
 
     // ref on object creates reactive object
-    const orderRef = ref(order);
-
-    //
-    expect(isRef(orderRef)).toEqual(true);
+    const order = ref(getOrder());
+    expect(isRef(order)).toEqual(true);
 
     // reactive is deep
-    expect(isReactive(orderRef.value)).toEqual(true);
-    expect(isReactive(orderRef.value[0])).toEqual(true);
-    expect(isReactive(orderRef.value[0].price)).toEqual(false);
+    expect(isReactive(order.value)).toEqual(true);
+    expect(isReactive(order.value[0])).toEqual(true);
+    expect(isReactive(order.value[0].price)).toEqual(false);
 
-    //
-    const rawOrder = toRaw(orderRef.value);
-    expect(Object.is(rawOrder, order)).toBe(true);
-    expect(toRaw(orderRef.value)).toEqual(order);
+    const total = computed(() =>
+      order.value.reduce(
+        (subTotal, item) => subTotal + item.qty * item.price,
+        0
+      )
+    );
+    expect(total.value).toEqual(1450);
 
-    orderRef.value[0].qty = 2;
-    expect(orderRef.value).toEqual(order);
+    order.value[0].qty = 2;
+    expect(total.value).toEqual(2450);
   });
 
   test('toRefs', () => {
     const state = reactive({
-      order: [
-        { id: 100, name: 'laptop', qty: 1, price: 1000 },
-        { id: 101, name: 'mobile', qty: 1, price: 450 }
-      ],
+      order: getOrder(),
       user: { id: 1000, name: 'Tony Stark' },
       vouchers: new Set(['deep-discount', 'only-today'])
     });

@@ -1,29 +1,36 @@
-import { beforeEach, describe, expect } from 'vitest';
-import { isRef, shallowRef, triggerRef, computed } from 'vue';
+import { describe, expect } from 'vitest';
+import { isRef, isReactive, ref, shallowRef, triggerRef, computed } from 'vue';
 
 describe('shallow-ref', () => {
-  let order;
-  let total;
+  const getOrder = () => [
+    { id: 100, name: 'laptop', qty: 1, price: 1000 },
+    { id: 101, name: 'mobile', qty: 1, price: 450 }
+  ];
 
-  beforeEach(() => {
-    order = shallowRef([
-      { id: 100, name: 'laptop', qty: 1, price: 1000 },
-      { id: 101, name: 'mobile', qty: 1, price: 450 }
-    ]);
-    total = computed(() =>
+  test('ref-vs-shallowRef', () => {
+    const orderA = ref(getOrder());
+    expect(isRef(orderA)).toEqual(true);
+    expect(isReactive(orderA.value)).toEqual(true);
+
+    const orderB = shallowRef(getOrder());
+    expect(isRef(orderB)).toEqual(true);
+    expect(isReactive(orderB.value)).toEqual(false); // Makes it shallow
+  });
+
+  test('basics', () => {
+    const order = shallowRef(getOrder());
+    const total = computed(() =>
       order.value.reduce(
         (subTotal, item) => subTotal + item.qty * item.price,
         0
       )
     );
-  });
-
-  test('basics', () => {
-    //
-    expect(isRef(order)).toEqual(true);
-
     // call atleast once
     expect(total.value).toEqual(1450);
+
+    // Change the item price
+    order.value[1].price = 550;
+    expect(total.value).not.toEqual(1550);
 
     // Change the order
     order.value = [{ id: 103, name: 'keyboard', qty: 1, price: 50 }];
@@ -31,10 +38,17 @@ describe('shallow-ref', () => {
   });
 
   test('force-trigger', () => {
-    // Access the computed value atleast once
+    const order = shallowRef(getOrder());
+    const total = computed(() =>
+      order.value.reduce(
+        (subTotal, item) => subTotal + item.qty * item.price,
+        0
+      )
+    );
+    // call atleast once
     expect(total.value).toEqual(1450);
 
-    // Re-computation will not happen due to shallow-ref
+    // Re-computation will not happen due to shallowRef
 
     // Change the item price
     order.value[1].price = 550;
@@ -46,7 +60,7 @@ describe('shallow-ref', () => {
 
     // Add a new item into order array
     order.value.push({ id: 102, name: 'keyboard', qty: 1, price: 50 });
-    expect(total.value).toEqual(1550);
+    expect(total.value).not.toEqual(1600);
 
     // Force trigger to re-compute
     triggerRef(order);
